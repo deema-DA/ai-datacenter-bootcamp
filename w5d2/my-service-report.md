@@ -15,20 +15,19 @@ Limitations: The workload was short and artificial, so it does not establish com
 Follow-up action: Repeat the measurement with longer and more representative traffic before treating this target as a production SLO.
 
 ## Measurement query
-
-Paste the expression used to produce the reported value. Give its evaluation
-time or range. Explain where the measurement is taken and what it excludes.
+histogram_quantile(0.95, sum by (le) (rate(vllm:time_to_first_token_seconds_bucket{job="serving"}[5m])))
+Evaluation: 5-minute rate window; evaluated during active traffic on 2026-09-13 UTC. The measurement is taken from the vLLM TTFT histogram for the serving job and excludes periods without usable observations.
 
 ## Service alert
 
-Condition and unit:
-Evaluation interval:
-Pending period:
-Relationship to the SLO:
-First response to a notification:
+Condition and unit: p95 TTFT is above 1.0 second (seconds)
+Evaluation interval: 1 minute
+Pending period: 1 minute
+Relationship to the SLO: The alert fires when the measured p95 TTFT exceeds the provisional 1.0-second SLO target, providing an operational warning that user-perceived responsiveness may be degraded.
+First response to a notification: Check the service traffic, Grafana TTFT measurement, and vLLM serving health.
+
 
 ## Notification test
-
-Firing received at:
-Resolved received at:
-What the test establishes:
+Firing received at: 2026-09-14T08:58:30+00:00
+Resolved received at: 2026-09-14T08:59:20+00:00
+What the test establishes: The Grafana webhook contact point successfully delivered both firing and resolved notifications for the artificial Lab notification test. This verifies notification delivery and recovery handling, not model-service recovery.
